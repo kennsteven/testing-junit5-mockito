@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +36,7 @@ class SpecialitySDJpaServiceTest {
     }
 
     @Test
-    void findByidTest() {
+    void findByIdTest() {
         Speciality speciality = new Speciality();
 
         when(specialtyRepository.findById(1L)).thenReturn(Optional.of(speciality));
@@ -47,12 +48,26 @@ class SpecialitySDJpaServiceTest {
     }
 
     @Test
+    void findByIdBddTest() {
+        Speciality speciality = new Speciality();
+
+        given(specialtyRepository.findById(1L)).willReturn(Optional.of(speciality));
+
+        Speciality foundSpeciality = specialitySDJpaService.findById(1L);
+
+        assertThat(foundSpeciality).isNotNull();
+        verify(specialtyRepository).findById(1L);
+
+    }
+
+    @Test
     void deleteById() {
         specialitySDJpaService.deleteById(1l);
         specialitySDJpaService.deleteById(1l);
 
         verify(specialtyRepository, times(2)).deleteById(1l);
     }
+
 
     @Test
     void delete() {
