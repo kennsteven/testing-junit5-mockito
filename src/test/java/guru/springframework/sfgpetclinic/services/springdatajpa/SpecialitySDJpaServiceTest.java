@@ -13,6 +13,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,46 +26,45 @@ class SpecialitySDJpaServiceTest {
     SpecialitySDJpaService specialitySDJpaService;
 
     @Test
-    void testDeleteByobject() {
+    void testDeleteByObject() {
+        //given
         Speciality speciality = new Speciality();
 
+        //when
         specialitySDJpaService.delete(speciality);
 
-        verify(specialtyRepository).delete(any(Speciality.class));
+        //then
+        then(specialtyRepository).should().delete(any(Speciality.class));
 
-        verify(specialtyRepository).findById(anyLong());
     }
 
     @Test
     void findByIdTest() {
+
+        //given
         Speciality speciality = new Speciality();
-
-        when(specialtyRepository.findById(1L)).thenReturn(Optional.of(speciality));
-
-        Speciality foundSpeciality = specialitySDJpaService.findById(1L);
-
-        assertThat(foundSpeciality).isNotNull();
-        verify(specialtyRepository).findById(1L);
-    }
-
-    @Test
-    void findByIdBddTest() {
-        Speciality speciality = new Speciality();
-
         given(specialtyRepository.findById(1L)).willReturn(Optional.of(speciality));
 
+        //when
         Speciality foundSpeciality = specialitySDJpaService.findById(1L);
 
+        //Then
         assertThat(foundSpeciality).isNotNull();
-        verify(specialtyRepository).findById(1L);
+        then(specialtyRepository).should().findById(anyLong());
+        then(specialtyRepository).should(times(1)).findById(anyLong());
 
     }
 
     @Test
     void deleteById() {
+        //given -none
+
+        //when
         specialitySDJpaService.deleteById(1l);
         specialitySDJpaService.deleteById(1l);
 
+        //then
+        then(specialtyRepository).should(times(2)).deleteById(anyLong());
         verify(specialtyRepository, times(2)).deleteById(1l);
     }
 
@@ -79,33 +79,46 @@ class SpecialitySDJpaServiceTest {
 
     @Test
     void deleteAtLeast() {
+        //given
+
+        //when
         specialitySDJpaService.deleteById(1l);
         specialitySDJpaService.deleteById(1l);
 
-        verify(specialtyRepository, atLeast(1)).deleteById(1l);
+        //then
+        then(specialtyRepository).should(atLeastOnce()).deleteById(1L);
     }
 
     @Test
     void deleteAtMost() {
+        //given
+
+        //when
         specialitySDJpaService.deleteById(1l);
         specialitySDJpaService.deleteById(1l);
 
-        verify(specialtyRepository, atMost(5)).deleteById(1l);
+        //then
+        then(specialtyRepository).should(atMost(5)).deleteById(1L);
     }
 
 
     @Test
     void deleteAtNever() {
+
+        //when
         specialitySDJpaService.deleteById(1l);
         specialitySDJpaService.deleteById(1l);
 
-        verify(specialtyRepository, never()).deleteById(5l);
+        //then
+        then(specialtyRepository).should(never()).deleteById(5l);
     }
 
     @Test
     void testDelete() {
+        //when
         specialitySDJpaService.delete(new Speciality());
 
-        verify(specialtyRepository, atMost(1)).delete(new Speciality());
+        //then
+        then(specialtyRepository).should(atMost(1)).delete(any(Speciality.class));
     }
 }
