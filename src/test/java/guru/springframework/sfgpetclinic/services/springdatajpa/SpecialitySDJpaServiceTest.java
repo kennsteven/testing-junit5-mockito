@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SpecialitySDJpaServiceTest {
 
-    @Mock
+    @Mock(lenient = true)
     SpecialtyRepository specialtyRepository;
 
     @InjectMocks
@@ -147,5 +147,41 @@ class SpecialitySDJpaServiceTest {
         assertThrows(RuntimeException.class, () -> specialtyRepository.delete(new Speciality()));
 
         then(specialtyRepository).should().delete(any());
+    }
+
+    @Test
+    void testSaveLambda() {
+        final String MATCH_ME = "MATCH_ME";
+        Speciality speciality = new Speciality();
+        speciality.setDescription(MATCH_ME);
+
+        Speciality savedSpeciality = new Speciality();
+        savedSpeciality.setId(1L);
+
+        //
+        given(specialtyRepository.save(argThat(argument -> argument.getDescription().equals(MATCH_ME)))).willReturn(savedSpeciality);
+
+        //when
+        Speciality returnedSpeciality = specialitySDJpaService.save(speciality);
+
+        assertThat(returnedSpeciality.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void testSaveLambdaNoMatch() {
+        final String MATCH_ME = "MATCH_ME";
+        Speciality speciality = new Speciality();
+        speciality.setDescription("Not match");
+
+        Speciality savedSpeciality = new Speciality();
+        savedSpeciality.setId(1L);
+
+        //
+        given(specialtyRepository.save(argThat(argument -> argument.getDescription().equals(MATCH_ME)))).willReturn(savedSpeciality);
+
+        //when
+        Speciality returnedSpeciality = specialitySDJpaService.save(speciality);
+
+        assertNull(returnedSpeciality);
     }
 }
