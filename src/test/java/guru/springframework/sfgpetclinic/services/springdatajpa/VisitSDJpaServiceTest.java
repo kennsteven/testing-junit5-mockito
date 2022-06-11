@@ -15,6 +15,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,17 +31,18 @@ class VisitSDJpaServiceTest {
     @DisplayName("Test find all")
     @Test
     void testFindAll() {
+        //given
         Visit visit = new Visit();
-
         Set<Visit> visits = new HashSet<>();
         visits.add(visit);
 
-        when(visitRepository.findAll()).thenReturn(visits);
+        given(visitRepository.findAll()).willReturn(visits);
 
+        //when
         Set<Visit> foundVisits = service.findAll();
 
-        verify(visitRepository).findAll();
-
+        //then
+        then(visitRepository).should().findAll();
         assertThat(foundVisits).hasSize(1);
 
     }
