@@ -17,8 +17,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OwnerControllerTest {
@@ -91,6 +90,8 @@ class OwnerControllerTest {
         //then
         assertThat("%DontFindMe%").isEqualToIgnoringCase(stringArgumentCaptor.getValue());
         assertThat("owners/findOwners").isEqualTo(viewName);
+
+        verifyNoInteractions(model);
     }
 
     @Test
@@ -108,7 +109,8 @@ class OwnerControllerTest {
 
         //inOrder asserts
         inOrder.verify(ownerService).findAllByLastNameLike(anyString());
-        inOrder.verify(model).addAttribute(anyString(), anyList());
+        //inOrder.verify(model).addAttribute(anyString(), any());
+        verifyNoMoreInteractions(model);
     }
 
 
