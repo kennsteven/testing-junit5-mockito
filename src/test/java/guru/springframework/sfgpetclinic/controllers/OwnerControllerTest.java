@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
@@ -31,6 +31,9 @@ class OwnerControllerTest {
 
     @Mock
     BindingResult bindingResult;
+
+    @Mock
+    Model model;
 
     @InjectMocks
     OwnerController ownerController;
@@ -67,11 +70,14 @@ class OwnerControllerTest {
         Owner owner = new Owner(1l,"Kenneth", "Alvarado");
 
         //when
-        String viewName = ownerController.processFindForm(owner, bindingResult, null);
+        String viewName = ownerController.processFindForm(owner, bindingResult, model);
 
         //then
         assertThat("%Alvarado%").isEqualToIgnoringCase(stringArgumentCaptor.getValue());
         assertThat("redirect:/owners/1").isEqualTo(viewName);
+
+
+
     }
 
     @Test
@@ -91,6 +97,7 @@ class OwnerControllerTest {
     void processFindFormWildCardStringFound() {
         //given
         Owner owner = new Owner(1l,"Kenneth", "findMe");
+        InOrder inOrder = Mockito.inOrder(ownerService, model);
 
         //when
         String viewName = ownerController.processFindForm(owner, bindingResult, Mockito.mock(Model.class));
@@ -98,6 +105,10 @@ class OwnerControllerTest {
         //then
         assertThat("%findMe%").isEqualToIgnoringCase(stringArgumentCaptor.getValue());
         assertThat("owners/ownersList").isEqualTo(viewName);
+
+        //inOrder asserts
+        inOrder.verify(ownerService).findAllByLastNameLike(anyString());
+        inOrder.verify(model).addAttribute(anyString(), anyList());
     }
 
 
